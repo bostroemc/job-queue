@@ -25,9 +25,17 @@ from datalayer.provider_node import ProviderNodeCallbacks, NodeCallback
 from datalayer.variant import Result, Variant
 
 import json
+from jsonschema import validate
 
 class NodePush:
     dataString: str = "Hello from Python Provider"
+
+    schema = {
+        "type" : "object",
+        "properties" : {
+            "ball_1" : {"type" : "string"},
+        },
+    }
     
     def __init__(self, queue):
         self.cbs = ProviderNodeCallbacks(
@@ -64,7 +72,14 @@ class NodePush:
     
     def __on_write(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         print("bostroemc: __on_write", data.get_string())
-        self.queue.append(data.get_string())
+        test = json.loads(data.get_string())
+
+        try:
+            validate(test, self.schema)
+            self.queue.append(data.get_string())
+        except ValidationError as e:
+            print(e)       
+        
         cb(Result(Result.OK), None)
 
     def __on_metadata(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):

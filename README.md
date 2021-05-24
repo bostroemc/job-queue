@@ -1,10 +1,11 @@
-# README datalayer.provider
+# README job-queue
 
-This python app __datalayer.provider__ provides Data Layer nodes. It can be used as sample to implement own apps.
+__job-queue__ exposes a simple FIFO buffer to the Data Layer. It is based on the 
+__datalayer.provider__ sample provided by ctrlX AUTOMATION SDK V1.8.
 
 ## Introduction
 
-The app demonstrates how a Data Layer connecion is established and a node is provided.
+The app demonstrates how a Data Layer connection is established and a node is provided.
 
 ## Prerequisites for Developing python Apps
 
