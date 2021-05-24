@@ -34,7 +34,7 @@ connectionProvider = "tcp://boschrexroth:boschrexroth@127.0.0.1:2070"
 def run_provider(provider : datalayer.provider.Provider):
 
     print("bostroemc: Starting provider...")
-    queue = ['\"ball_1\": \"red\"}']
+    queue = ['{\"ball_1\": \"red\"}']
 
     node_push = datalayerprovider.my_provider_node.NodePush(queue)
     node_pop = datalayerprovider.my_provider_node.NodePop(queue)

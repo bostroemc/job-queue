@@ -73,10 +73,11 @@ class NodePush:
     def __on_write(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         print("bostroemc: __on_write", data.get_string())
         test = json.loads(data.get_string())
+        print("Cum on me, Stormy")
+        print(test)
 
         try:
             validate(test, self.schema)
-            print(self.schema, self.queue)
             self.queue.append(data.get_string())
         except ValidationError as e:
             print(e)       
