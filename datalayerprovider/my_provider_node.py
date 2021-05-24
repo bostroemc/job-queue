@@ -132,3 +132,47 @@ class NodePop:
     def __on_metadata(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
         print("__on_metadata")
         cb(Result(Result.OK), None)        
+
+class Node:
+    data: int = 0
+    
+    def __init__(self, queue):
+        self.cbs = ProviderNodeCallbacks(
+        self.__on_create,
+        self.__on_remove,
+        self.__on_browse,
+        self.__on_read,
+        self.__on_write,
+        self.__on_metadata
+        )
+        self.queue = queue
+
+    def __on_create(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
+        print("__on_create")
+        self.data
+        cb(Result(Result.OK), None)
+
+    def __on_remove(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
+        # Not implemented because no wildcard is registered
+        print("__on_remove")
+        cb(Result(Result.UNSUPPORTED), None)
+
+    def __on_browse(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
+        print("__on_browse")
+        new_data = Variant()
+        new_data.set_array_string([])
+        cb(Result(Result.OK), new_data)
+
+    def __on_read(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
+        print("bostroemc: __on_read", userdata)
+        new_data = Variant()
+        new_data = len(self.queue)
+        cb(Result(Result.OK), new_data)
+    
+    def __on_write(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
+        print("bostroemc: __on_write")
+        cb(Result(Result.OK), None)
+
+    def __on_metadata(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
+        print("__on_metadata")
+        cb(Result(Result.OK), None)              

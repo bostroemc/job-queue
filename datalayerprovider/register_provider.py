@@ -34,19 +34,24 @@ connectionProvider = "tcp://boschrexroth:boschrexroth@127.0.0.1:2070"
 def run_provider(provider : datalayer.provider.Provider):
 
     print("bostroemc: Starting provider...")
-    queue = ['red', 'blue', 'green']
+    queue = ['\"ball_1\": \"red\"}']
 
     node_push = datalayerprovider.my_provider_node.NodePush(queue)
     node_pop = datalayerprovider.my_provider_node.NodePop(queue)
+    node_count = datalayerprovider.my_provider_node.Node(queue)
 
-    with datalayer.provider_node.ProviderNode(node_push.cbs, 1234) as node, datalayer.provider_node.ProviderNode(node_pop.cbs, 1234) as node_2:
+    with datalayer.provider_node.ProviderNode(node_push.cbs, 1234) as node, datalayer.provider_node.ProviderNode(node_pop.cbs, 1234) as node_2, datalayer.provider_node.ProviderNode(node_count.cbs, 1234) as node_3:
         result = provider.register_node("mechatronics/job_request", node)
         if result != datalayer.variant.Result.OK:
-            print("bostroemc: Register Data Provider failed with: ", result)
+            print("bostroemc: Register job_request failed with: ", result)
 
         result = provider.register_node("mechatronics/pop", node_2)
         if result != datalayer.variant.Result.OK:
-            print("bostroemc: Register Data Provider failed with: ", result)
+            print("bostroemc: Register pop failed with: ", result)
+
+        result = provider.register_node("mechatronics/count", node_3)
+        if result != datalayer.variant.Result.OK:
+            print("bostroemc: Register count failed with: ", result)
 
         result= provider.start()
         if result != datalayer.variant.Result.OK:
