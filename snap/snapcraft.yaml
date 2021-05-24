@@ -1,5 +1,5 @@
 name: job-queue
-version: 1.0.5
+version: 1.0.6
 summary: Python-based queue for Rexroth ctrlX AUTOMATION platform 
 # title: SDK-Python
 description: 'job-queue provides functionality specific to the Rexroth mechatronics demo

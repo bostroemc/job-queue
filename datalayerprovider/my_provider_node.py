@@ -167,7 +167,7 @@ class Node:
     def __on_read(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         print("bostroemc: count __on_read", len(self.queue))
         new_data = Variant()
-        new_data.set_string(str(len(self.queue)))
+        new_data.set_uint32(len(self.queue))
         cb(Result(Result.OK), new_data)
     
     def __on_write(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
