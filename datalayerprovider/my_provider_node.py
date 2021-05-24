@@ -76,6 +76,7 @@ class NodePush:
 
         try:
             validate(test, self.schema)
+            print(self.schema, self.queue)
             self.queue.append(data.get_string())
         except ValidationError as e:
             print(e)       
