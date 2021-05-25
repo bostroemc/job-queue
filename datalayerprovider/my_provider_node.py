@@ -25,10 +25,12 @@ from datalayer.provider_node import ProviderNodeCallbacks, NodeCallback
 from datalayer.variant import Result, Variant
 
 import json
+import time
 from jsonschema import validate
 
 class NodePush:
     dataString: str = "Hello from Python Provider"
+    id : int = 0
 
     schema = {
         "type" : "object",
@@ -74,16 +76,20 @@ class NodePush:
         cb(Result(Result.OK), new_data)
     
     def __on_write(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
-        print("bostroemc: __on_write", data.get_string())
         test = json.loads(data.get_string())
-        print(test)
 
         try:
             validate(test, self.schema)
-            self.queue.append(data.get_string())
+            # t = time.localtime()
+            # test.time[0] = time.strftime("%H:%M:%S", t)
+
+            # test.id = self.id
+            # self.queue.append(data.get_string())
+            self.queue.append(test)
         except ValidationError as e:
             print(e)       
         
+        self.id+=1
         cb(Result(Result.OK), None)
 
     def __on_metadata(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):

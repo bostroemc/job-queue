@@ -34,7 +34,7 @@ connectionProvider = "tcp://boschrexroth:boschrexroth@127.0.0.1:2070"
 def run_provider(provider : datalayer.provider.Provider):
 
     print("bostroemc: Starting provider...")
-    queue = ['{\"ball_1\": \"red\"}']
+    queue = []
 
     node_push = datalayerprovider.my_provider_node.NodePush(queue)
     node_pop = datalayerprovider.my_provider_node.NodePop(queue)
@@ -63,7 +63,7 @@ def run_provider(provider : datalayer.provider.Provider):
         count=0
         while True:
             count=count+1
-            if count > 3599:
+            if count > 7199:
                 break
             time.sleep(1)
         
