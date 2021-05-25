@@ -81,11 +81,11 @@ class NodePush:
         try:
             validate(test, self.schema)
             t = time.localtime()
-            test.time[0] = time.strftime("%H:%M:%S", t)
-            test.time[1] = ""
-
-            test.id = self.id
-            self.queue.append(data.get_string())
+            test["time"] = [time.strftime("%H:%M:%S", t)]
+            test["time"].append("")
+ 
+            test[id] = self.id
+            # self.queue.append(data.get_string())
             self.queue.append(test)
         except ValidationError as e:
             print(e)       
