@@ -84,7 +84,7 @@ class NodePush:
             test["time"] = [time.strftime("%H:%M:%S", t)]
             test["time"].append("")
  
-            test[id] = self.id
+            test["id"] = self.id
             # self.queue.append(data.get_string())
             self.queue.append(test)
         except ValidationError as e:
