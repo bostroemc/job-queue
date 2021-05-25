@@ -112,36 +112,31 @@ class NodePop:
         self.queue = queue
 
     def __on_create(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
-        print("__on_create")
         self.dataString
         cb(Result(Result.OK), None)
 
     def __on_remove(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
         # Not implemented because no wildcard is registered
-        print("__on_remove")
         cb(Result(Result.UNSUPPORTED), None)
 
     def __on_browse(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
-        print("__on_browse")
         new_data = Variant()
         new_data.set_array_string([])
         cb(Result(Result.OK), new_data)
 
     def __on_read(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
-        print("bostroemc: __on_read", userdata)
         new_data = Variant()
-        new_data.set_string(json.dumps(self.queue[0]))
+        new_data.set_string(json.dumps(self.queue[0]) if len(self.queue)>0 else "")
         cb(Result(Result.OK), new_data)
     
     def __on_write(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
-        print("bostroemc: __on_write", data.get_string())
         new_data = Variant()
-        new_data.set_string(json.dumps(self.queue[0]))
-        self.queue.pop(0)
+
+        new_data.set_string(json.dumps(self.queue[0]) if len(self.queue)>0 else "")
+        if len(self.queue)>0: self.queue.pop(0)
         cb(Result(Result.OK), new_data)
 
     def __on_metadata(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
-        print("__on_metadata")
         cb(Result(Result.OK), None)        
 
 class Node:
