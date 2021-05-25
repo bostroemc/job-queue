@@ -33,9 +33,11 @@ class NodePush:
     schema = {
         "type" : "object",
         "properties" : {
-            "ball_1" : {"type" : "string"},
+            "name" : {"type" : "array"},
+            "email" : {"type" : "string"},
+            "color" : {"type" : "array"},
         },
-        "required" : ["ball_1"]
+        "required" : ["name", "email", "color"]
     }
     
     def __init__(self, queue):
