@@ -133,7 +133,7 @@ class Pop:
         _data = Variant()
    
         conn = datalayerprovider.utils.initialize(self.db)
-        if conn:
+        if conn and data.get_uint32() == 1:  #modified 14.06 for testing
             self._value = json.dumps(datalayerprovider.utils.pop(conn))
             _data.set_string(self._value)
             conn.close()
@@ -230,7 +230,7 @@ class Done:
         _data = Variant() 
 
         conn = datalayerprovider.utils.initialize(self.db)
-        if conn:
+        if conn and data.get_uint32() > 0:  #modified 14.06 for testing
             self._value = json.dumps(datalayerprovider.utils.done(conn, data.get_string()))
             _data.set_string(self._value)           
             conn.close()
