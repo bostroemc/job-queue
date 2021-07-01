@@ -24,7 +24,7 @@ def initialize(db):
 # add job order to queue
 def add_job_order(conn, job_order):
     try:
-        time_in = time.strftime("%H:%M:%S", time.localtime())   
+        time_in = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())   
   
         c = conn.cursor()
         c.execute("INSERT INTO queue(job_order, time_in) VALUES(?, ?);", (job_order, time_in))
@@ -97,7 +97,7 @@ def done(conn, id):
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
-    time_out = time.strftime("%H:%M:%S", time.localtime())   
+    time_out = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())   
 
     c.execute("SELECT * FROM history WHERE id = ?", [id])
     result = c.fetchone()
