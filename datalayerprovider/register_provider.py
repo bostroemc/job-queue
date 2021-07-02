@@ -37,7 +37,7 @@ connectionProvider = "tcp://boschrexroth:boschrexroth@127.0.0.1:2070"
 def run_provider(provider : datalayer.provider.Provider):
     offset = [0, 0]  #Fetch offsets [queue, history]
     
-    db = "file:memdb1?mode=memory&cache=shared" #in-memory database used.     
+    db = "file:memdb1?mode=memory&cache=shared" #in-memory database      
     # db = os.environ.get("SNAP_COMMON") + "/temp.db"
     
     conn = datalayerprovider.utils.initialize(db) #Leave one connection instance open to maintain memory
@@ -55,34 +55,38 @@ def run_provider(provider : datalayer.provider.Provider):
             datalayer.provider_node.ProviderNode(node_history.cbs, 1234) as node_5:  
         result = provider.register_node("mechatronics/job_request", node)
         if result != datalayer.variant.Result.OK:
-            print("bostroemc: Register job_request failed with: ", result)
+            print("Register job_request failed with: ", result)
 
         result = provider.register_node("mechatronics/pop", node_2)
         if result != datalayer.variant.Result.OK:
-            print("bostroemc: Register pop failed with: ", result)
+            print("Register pop failed with: ", result)
 
         result = provider.register_node("mechatronics/count", node_3)
         if result != datalayer.variant.Result.OK:
-            print("bostroemc: Register count failed with: ", result)
+            print("Register count failed with: ", result)
 
         result = provider.register_node("mechatronics/done", node_4)
         if result != datalayer.variant.Result.OK:
-            print("bostroemc: Register count failed with: ", result)        
+            print("Register count failed with: ", result)        
 
         result = provider.register_node("mechatronics/history", node_5)
         if result != datalayer.variant.Result.OK:
-            print("bostroemc: Register history failed with: ", result)                
+            print("Register history failed with: ", result)                
 
         result= provider.start()
         if result != datalayer.variant.Result.OK:
-            print("bostroemc: Starting Provider failed with: ", result)
+            print("Starting Provider failed with: ", result)
             
         count=0
         while True:
+            if datalayerprovider.utils.count() == 0:
+                datalayerprovider.utils.add_virtual_job_order(conn, 3)
+
             count=count+1
             if count > 7199:
                 break
-            time.sleep(1)
+
+            time.sleep(5)
         
         conn.close()     
 

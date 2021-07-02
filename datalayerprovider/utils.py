@@ -4,6 +4,9 @@ import signal
 import time
 import sqlite3
 from sqlite3 import Error
+import names
+import random
+import json
 
 # initialize database connection, adding tables queue and history if required
 def initialize(db):
@@ -34,6 +37,13 @@ def add_job_order(conn, job_order):
     
     except Error as e:
         print(e)  
+
+def add_virtual_job_order(conn, qty):
+    for x in range(qty):
+        name = [names.get_first_name(), names.get_last_name()]
+        email = f"{name[0]}.{name[1]}@email.com"
+        job_order = {"name":[name[0], name[1]], "email":email, "company": "ACME Corp", "color": [get_ball(), get_ball(), get_ball()]}
+        add_job_order(conn, json.dumps(job_order))
 
 
 # return queue count
@@ -120,4 +130,9 @@ def create_connection(db):
     except Error as e:
         print(e)
 
-    return conn            
+    return conn       
+
+# generate random ball
+def get_ball():
+    color = ["red", "white", "blue"]
+    return color[random.randint(0,2)]     
