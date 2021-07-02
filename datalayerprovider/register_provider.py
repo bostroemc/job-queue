@@ -86,7 +86,7 @@ def run_provider(provider : datalayer.provider.Provider):
             
         count=0
         while True:
-            if datalayerprovider.utils.count_queue(conn) == 0  and node_auto.__value():
+            if datalayerprovider.utils.count_queue(conn) == 0  and node_auto.value():
                 datalayerprovider.utils.add_virtual_job_order(conn, 3)
 
             count=count+1

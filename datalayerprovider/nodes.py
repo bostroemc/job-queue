@@ -320,5 +320,5 @@ class Auto:
     def __on_metadata(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
         cb(Result(Result.OK), None)    
 
-    def __value(self):
+    def value(self):
         return self.auto          
