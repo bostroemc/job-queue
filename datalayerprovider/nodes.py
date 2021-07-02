@@ -310,11 +310,11 @@ class Auto:
 
     def __on_read(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         _data = Variant()
-        _data.set_bool(self.auto) 
+        _data.set_bool8(self.auto) 
         cb(Result(Result.OK), _data)
     
     def __on_write(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
-        self.auto = data.get_bool()
+        self.auto = data.get_bool8()
         cb(Result(Result.OK), None)
 
     def __on_metadata(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
