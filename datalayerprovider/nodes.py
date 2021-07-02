@@ -282,3 +282,43 @@ class History:
 
     def __on_metadata(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
         cb(Result(Result.OK), None)  
+
+class Auto:
+     
+    def __init__(self, auto):
+        self.cbs = ProviderNodeCallbacks(
+        self.__on_create,
+        self.__on_remove,
+        self.__on_browse,
+        self.__on_read,
+        self.__on_write,
+        self.__on_metadata
+        )
+        self.auto = auto
+
+    def __on_create(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
+        cb(Result(Result.OK), None)
+
+    def __on_remove(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
+        # Not implemented because no wildcard is registered
+        cb(Result(Result.UNSUPPORTED), None)
+
+    def __on_browse(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
+        _data = Variant()
+        _data.set_array_string([])
+        cb(Result(Result.OK), _data)
+
+    def __on_read(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
+        _data = Variant()
+        _data.set_bool(self.auto) 
+        cb(Result(Result.OK), _data)
+    
+    def __on_write(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
+        self.auto = data.get_bool()
+        cb(Result(Result.OK), None)
+
+    def __on_metadata(self, userdata: datalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
+        cb(Result(Result.OK), None)    
+
+    def __value(self):
+        return self.auto          

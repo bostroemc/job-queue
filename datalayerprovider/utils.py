@@ -42,7 +42,7 @@ def add_virtual_job_order(conn, qty):
     for x in range(qty):
         name = [names.get_first_name(), names.get_last_name()]
         email = f"{name[0]}.{name[1]}@email.com"
-        job_order = {"name":[name[0], name[1]], "email":email, "company": "ACME Corp", "color": [get_ball(), get_ball(), get_ball()]}
+        job_order = {"name":[name[0], name[1]], "email":email, "company": "virtual", "color": [get_ball(), get_ball(), get_ball()]}
         add_job_order(conn, json.dumps(job_order))
 
 
