@@ -136,6 +136,8 @@ class Pop:
         if conn and int(data.get_string()) == 1:  #modified 14.06 for testing
             self._value = json.dumps(datalayerprovider.utils.pop(conn))
             _data.set_string(self._value)
+        
+        if conn: 
             conn.close()
 
         cb(Result(Result.OK), _data)        
@@ -185,6 +187,8 @@ class Count:
         conn = datalayerprovider.utils.initialize(self.db)
         if conn and data.get_uint32() == 0:
             datalayerprovider.utils.dump(conn)
+        
+        if conn: 
             conn.close()
 
         cb(Result(Result.OK), None)
@@ -233,6 +237,8 @@ class Done:
         if conn and int(data.get_string()) > 0:  #modified 14.06 for testing
             self._value = json.dumps(datalayerprovider.utils.done(conn, data.get_string()))
             _data.set_string(self._value)           
+        
+        if conn: 
             conn.close()
 
         cb(Result(Result.OK), _data)
