@@ -42,6 +42,7 @@ def run_provider(provider : datalayer.provider.Provider):
     # db = os.environ.get("SNAP_COMMON") + "/temp.db"
     
     base = datalayerprovider.utils.initialize(db) #Leave one connection instance open to maintain memory
+    base.execute("pragma journal_mode=wal;")       #Configure database in "write-ahead log" mode
 
     node_push = datalayerprovider.nodes.Push(db)  #add job to queue
     node_pop = datalayerprovider.nodes.Pop(db)    #pop job from queue
