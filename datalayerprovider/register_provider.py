@@ -41,7 +41,7 @@ def run_provider(provider : datalayer.provider.Provider):
     db = "file:memdb1?mode=memory&cache=shared" #in-memory database      
     # db = os.environ.get("SNAP_COMMON") + "/temp.db"
     
-    conn = datalayerprovider.utils.initialize(db) #Leave one connection instance open to maintain memory
+    base = datalayerprovider.utils.initialize(db) #Leave one connection instance open to maintain memory
 
     node_push = datalayerprovider.nodes.Push(db)  #add job to queue
     node_pop = datalayerprovider.nodes.Pop(db)    #pop job from queue
@@ -86,8 +86,12 @@ def run_provider(provider : datalayer.provider.Provider):
             
         count=0
         while True:
-            if datalayerprovider.utils.count_queue(conn) == 0  and node_auto.value():
-                datalayerprovider.utils.add_virtual_job_order(conn, 3)
+            conn = datalayerprovider.utils.initialize(db)
+            if conn: 
+                if datalayerprovider.utils.count_queue(conn) == 0  and node_auto.value():
+                    datalayerprovider.utils.add_virtual_job_order(conn, 3)
+
+                conn.close()
 
             count=count+1
             if count > 7199:
@@ -95,7 +99,7 @@ def run_provider(provider : datalayer.provider.Provider):
 
             time.sleep(5)
         
-        conn.close()     
+        base.close()     #close base database connection
 
         result = provider.stop()
  
