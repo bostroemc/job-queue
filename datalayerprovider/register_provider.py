@@ -32,8 +32,6 @@ import datalayer
 import datalayerprovider.nodes
 import datalayerprovider.utils
 
-connectionProvider = "tcp://boschrexroth:boschrexroth@127.0.0.1:2070"
-
 def run_provider(provider : datalayer.provider.Provider):
     offset = [0, 0]  #Fetch offsets [queue, history]
     auto = True 
@@ -81,9 +79,10 @@ def run_provider(provider : datalayer.provider.Provider):
         if result != datalayer.variant.Result.OK:
             print("Register auto failed with: ", result)      
 
+        print('job-queue starting...')
         result= provider.start()
         if result != datalayer.variant.Result.OK:
-            print("Starting Provider failed with: ", result)
+            print("Starting job-queue failed with: ", result)
             
         count=0
         while True:
@@ -114,6 +113,12 @@ def run():
     # Create and start ctrlX datalayer...")
     with datalayer.system.System("") as datalayer_system:
         datalayer_system.start(False)
+
+        connectionProvider = "tcp://boschrexroth:boschrexroth@127.0.0.1:2070"
+        if 'SNAP' in os.environ:
+            connectionProvider = "ipc://"
+
+        print("Connecting", connectionProvider)    
 
         # Creating provider...
         with datalayer_system.factory().create_provider(connectionProvider) as provider:
