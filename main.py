@@ -30,8 +30,8 @@ import sqlite3
 from sqlite3 import Error
 import json
 
-import datalayer
-from datalayer.variant import Variant
+import ctrlxdatalayer
+from ctrlxdatalayer.variant import Variant
 
 import app.nodes
 import app.utils
@@ -39,7 +39,7 @@ import app.utils
 
 def main():
     # Create and start ctrlX datalayer...")
-    with datalayer.system.System("") as datalayer_system:
+    with ctrlxdatalayer.system.System("") as datalayer_system:
         datalayer_system.start(False)
 
         connectionProvider = "tcp://boschrexroth:boschrexroth@127.0.0.1:2070"
@@ -55,7 +55,7 @@ def main():
         datalayer_system.stop(True)
 
 
-def run_provider(provider : datalayer.provider.Provider):
+def run_provider(provider : ctrlxdatalayer.provider.Provider):
     offset = [0, 0]  #Fetch offsets [queue, history]
     auto = True 
     
@@ -72,39 +72,39 @@ def run_provider(provider : datalayer.provider.Provider):
     node_history = app.nodes.History(db)    #fetch items from history
     node_auto = app.nodes.Auto(auto)    #automatically generate job orders when true
 
-    with datalayer.provider_node.ProviderNode(node_push.cbs, 1234) as node,         \
-            datalayer.provider_node.ProviderNode(node_pop.cbs, 1234) as node_2,     \
-            datalayer.provider_node.ProviderNode(node_count.cbs, 1234) as node_3,   \
-            datalayer.provider_node.ProviderNode(node_done.cbs, 1234) as node_4,    \
-            datalayer.provider_node.ProviderNode(node_history.cbs, 1234) as node_5, \
-            datalayer.provider_node.ProviderNode(node_auto.cbs, 1234) as node_6:       
+    with ctrlxdatalayer.provider_node.ProviderNode(node_push.cbs, 1234) as node,         \
+            ctrlxdatalayer.provider_node.ProviderNode(node_pop.cbs, 1234) as node_2,     \
+            ctrlxdatalayer.provider_node.ProviderNode(node_count.cbs, 1234) as node_3,   \
+            ctrlxdatalayer.provider_node.ProviderNode(node_done.cbs, 1234) as node_4,    \
+            ctrlxdatalayer.provider_node.ProviderNode(node_history.cbs, 1234) as node_5, \
+            ctrlxdatalayer.provider_node.ProviderNode(node_auto.cbs, 1234) as node_6:       
         result = provider.register_node("mechatronics/job_request", node)
-        if result != datalayer.variant.Result.OK:
+        if result != ctrlxdatalayer.variant.Result.OK:
             print("Register job_request failed with: ", result)
 
         result = provider.register_node("mechatronics/pop", node_2)
-        if result != datalayer.variant.Result.OK:
+        if result != ctrlxdatalayer.variant.Result.OK:
             print("Register pop failed with: ", result)
 
         result = provider.register_node("mechatronics/count", node_3)
-        if result != datalayer.variant.Result.OK:
+        if result != ctrlxdatalayer.variant.Result.OK:
             print("Register count failed with: ", result)
 
         result = provider.register_node("mechatronics/done", node_4)
-        if result != datalayer.variant.Result.OK:
+        if result != ctrlxdatalayer.variant.Result.OK:
             print("Register count failed with: ", result)        
 
         result = provider.register_node("mechatronics/history", node_5)
-        if result != datalayer.variant.Result.OK:
+        if result != ctrlxdatalayer.variant.Result.OK:
             print("Register history failed with: ", result)                
 
         result = provider.register_node("mechatronics/auto", node_6)
-        if result != datalayer.variant.Result.OK:
+        if result != ctrlxdatalayer.variant.Result.OK:
             print("Register auto failed with: ", result)      
 
         print('job-queue starting...')
         result= provider.start()
-        if result != datalayer.variant.Result.OK:
+        if result != ctrlxdatalayer.variant.Result.OK:
             print("Starting job-queue failed with: ", result)
             
         count=0
