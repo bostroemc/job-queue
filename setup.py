@@ -1,8 +1,8 @@
 from setuptools import setup
 
 setup(
-    name='rfs-parts-db',
-    version='2.0.4',
+    name='job-queue',
+    version='2.0.5',
     description='Python-based queue for Rexroth ctrlX AUTOMATION platform ',
     author='bostroemc',
     install_requires = ['ctrlx-datalayer', 'ctrlx_fbs', 'jsonschema', 'names'],    
