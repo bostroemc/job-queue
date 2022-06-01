@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='job-queue',
-    version='2.0.5',
+    version='2.0.6',
     description='Python-based queue for Rexroth ctrlX AUTOMATION platform ',
     author='bostroemc',
     install_requires = ['ctrlx-datalayer', 'ctrlx_fbs', 'jsonschema', 'names'],    
