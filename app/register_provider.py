@@ -29,8 +29,8 @@ from sqlite3 import Error
 import json
 
 import datalayer
-import datalayerprovider.nodes
-import datalayerprovider.utils
+import app.nodes
+import app.utils
 
 def run_provider(provider : datalayer.provider.Provider):
     offset = [0, 0]  #Fetch offsets [queue, history]
@@ -39,15 +39,15 @@ def run_provider(provider : datalayer.provider.Provider):
     db = "file:memdb1?mode=memory&cache=shared" #in-memory database      
     # db = os.environ.get("SNAP_COMMON") + "/temp.db"
     
-    base = datalayerprovider.utils.initialize(db) #Leave one connection instance open to maintain memory
+    base = app.utils.initialize(db) #Leave one connection instance open to maintain memory
     base.execute("pragma journal_mode=wal;")       #Configure database in "write-ahead log" mode
 
-    node_push = datalayerprovider.nodes.Push(db)  #add job to queue
-    node_pop = datalayerprovider.nodes.Pop(db)    #pop job from queue
-    node_count = datalayerprovider.nodes.Count(db)     #return queue/pending count, write zero to dump
-    node_done =  datalayerprovider.nodes.Done(db)     #add item to db or mark item in db as done
-    node_history = datalayerprovider.nodes.History(db)    #fetch items from history
-    node_auto = datalayerprovider.nodes.Auto(auto)    #automatically generate job orders when true
+    node_push = app.nodes.Push(db)  #add job to queue
+    node_pop = app.nodes.Pop(db)    #pop job from queue
+    node_count = app.nodes.Count(db)     #return queue/pending count, write zero to dump
+    node_done =  app.nodes.Done(db)     #add item to db or mark item in db as done
+    node_history = app.nodes.History(db)    #fetch items from history
+    node_auto = app.nodes.Auto(auto)    #automatically generate job orders when true
 
     with datalayer.provider_node.ProviderNode(node_push.cbs, 1234) as node,         \
             datalayer.provider_node.ProviderNode(node_pop.cbs, 1234) as node_2,     \
@@ -86,10 +86,10 @@ def run_provider(provider : datalayer.provider.Provider):
             
         count=0
         while True:
-            conn = datalayerprovider.utils.initialize(db)
+            conn = app.utils.initialize(db)
             if conn: 
-                if datalayerprovider.utils.count_queue(conn) == 0  and node_auto.value():
-                    datalayerprovider.utils.add_virtual_job_order(conn, 3)
+                if app.utils.count_queue(conn) == 0  and node_auto.value():
+                    app.utils.add_virtual_job_order(conn, 3)
 
                 conn.close()
 

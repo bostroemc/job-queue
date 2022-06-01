@@ -31,7 +31,7 @@ import os
 from sqlite3 import Error
 from jsonschema import validate
 
-import datalayerprovider.utils
+import app.utils
 
 class Push:
     dataString: str = "Hello from Python Provider"
@@ -74,9 +74,9 @@ class Push:
     def __on_read(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         _data = Variant()
 
-        conn = datalayerprovider.utils.initialize(self.db)
+        conn = app.utils.initialize(self.db)
         if conn:
-            _data.set_string(json.dumps(datalayerprovider.utils.fetch_queue(conn, 50, 0))) 
+            _data.set_string(json.dumps(app.utils.fetch_queue(conn, 50, 0))) 
             conn.close()
 
         cb(Result(Result.OK), _data)
@@ -85,9 +85,9 @@ class Push:
         _test = json.loads(data.get_string())
         # _isValid = validate(_test, self.schema)
  
-        conn = datalayerprovider.utils.initialize(self.db)
+        conn = app.utils.initialize(self.db)
         if conn: # and _isValid:
-            datalayerprovider.utils.add_job_order(conn, json.dumps(_test))
+            app.utils.add_job_order(conn, json.dumps(_test))
             conn.close()
 
         cb(Result(Result.OK), None)        
@@ -132,9 +132,9 @@ class Pop:
     def __on_write(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         _data = Variant()
    
-        conn = datalayerprovider.utils.initialize(self.db)
+        conn = app.utils.initialize(self.db)
         if conn and int(data.get_string()) == 1:  #modified 14.06 for testing
-            self._value = json.dumps(datalayerprovider.utils.pop(conn))
+            self._value = json.dumps(app.utils.pop(conn))
             _data.set_string(self._value)
         
         if conn: 
@@ -176,17 +176,17 @@ class Count:
     def __on_read(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         _data = Variant()
 
-        conn = datalayerprovider.utils.initialize(self.db)
+        conn = app.utils.initialize(self.db)
         if conn:
-            _data.set_uint32(datalayerprovider.utils.count_queue(conn))
+            _data.set_uint32(app.utils.count_queue(conn))
             conn.close()
 
         cb(Result(Result.OK), _data)
     
     def __on_write(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
-        conn = datalayerprovider.utils.initialize(self.db)
+        conn = app.utils.initialize(self.db)
         if conn and data.get_uint32() == 0:
-            datalayerprovider.utils.dump(conn)
+            app.utils.dump(conn)
         
         if conn: 
             conn.close()
@@ -233,9 +233,9 @@ class Done:
     def __on_write(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         _data = Variant() 
 
-        conn = datalayerprovider.utils.initialize(self.db)
+        conn = app.utils.initialize(self.db)
         if conn and int(data.get_string()) > 0:  #modified 14.06 for testing
-            self._value = json.dumps(datalayerprovider.utils.done(conn, data.get_string()))
+            self._value = json.dumps(app.utils.done(conn, data.get_string()))
             _data.set_string(self._value)           
         
         if conn: 
@@ -276,9 +276,9 @@ class History:
     def __on_read(self, userdata: datalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         _data = Variant()
 
-        conn = datalayerprovider.utils.initialize(self.db)
+        conn = app.utils.initialize(self.db)
         if conn:
-            _data.set_string(json.dumps(datalayerprovider.utils.fetch_history(conn, 50, 0))) 
+            _data.set_string(json.dumps(app.utils.fetch_history(conn, 50, 0))) 
             conn.close()
 
         cb(Result(Result.OK), _data)

@@ -1,10 +1,10 @@
 name: job-queue
-version: 2.0.3
+version: 2.0.4
 summary: Python-based queue for Rexroth ctrlX AUTOMATION platform 
 # title: SDK-Python
 description: 'job-queue provides functionality specific to the Rexroth mechatronics demo
 '
-base: core18
+base: core20
 confinement: strict
 grade: stable
 
@@ -12,44 +12,67 @@ architectures:
   - build-on: arm64
   - build-on: amd64
 
-apps:
-  interpreter:
-    command: python3
-    plugs:
-      - network-bind
-      - network-observe
-      - serial-port
+#apps:
+#  interpreter:
+#    command: python3
+#    plugs:
+#      - network-bind
+#      - network-observe
+#      - serial-port
 
-  provider:
-    command: ./wrapper/register_job_queue
-    plugs:
-      - network-bind
-      - network-status
-    daemon: simple
+#  provider:
+#    command: ./wrapper/register_job_queue
+#    plugs:
+#      - network-bind
+#      - network-status
+#    daemon: simple
 
-parts:
-  interpreter:
-    plugin: python
-    python-version: python3
-    source: .
-    python-packages:
-      - jsonschema
-      - names
+#parts:
+#  interpreter:
+#    plugin: python
+#    python-version: python3
+#    source: .
+#    python-packages:
+#      - jsonschema
+#      - names
 
-  provider:
-    plugin: python
-    python-version: python3
-    source: .
-    python-packages:
-      - ./whl/ctrlx_datalayer-1.4.0-py3-none-any.whl
-      - ./whl/ctrlx_fbs-1.0.0-py3-none-any.whl
-      - flatbuffers~=1.12
+#  provider:
+#    plugin: python
+#    python-version: python3
+#    source: .
+#    python-packages:
+#      - ./whl/ctrlx_datalayer-1.4.0-py3-none-any.whl
+#      - ./whl/ctrlx_fbs-1.0.0-py3-none-any.whl
+#      - flatbuffers~=1.12
 
-  files:
-    plugin: dump
-    source: . 
+#  files:
+#    plugin: dump
+#    source: . 
 
 # describes which interface slots are supported by defining the plugs
+#plugs:
+#  datalayer:
+#    interface: content
+#    content: datalayer
+#    target: $SNAP_DATA/.datalayer 
+
+apps:
+  provider:
+    command: bin/main.py
+    plugs:
+      - network
+      - datalayer
+      - removable-media      
+    daemon: simple
+    restart-condition: always
+    passthrough:   
+      restart-delay: 10s
+
+parts:
+  provider:
+    plugin: python
+    source: .
+
 plugs:
   datalayer:
     interface: content
