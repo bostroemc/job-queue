@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import ctrlxdatalayer.clib
+import ctrlxdatalayer
 from ctrlxdatalayer.provider_node import ProviderNodeCallbacks, NodeCallback
 from ctrlxdatalayer.variant import Result, Variant
 

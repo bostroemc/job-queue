@@ -28,6 +28,13 @@ parts:
     plugin: python
     source: .
 
+  datalayerdeb:
+      plugin: dump
+      source: ./deb/ctrlx-datalayer-1.7.13.deb
+      source-type: deb
+      stage-packages:
+        - libzmq5
+
 plugs:
   datalayer:
     interface: content
