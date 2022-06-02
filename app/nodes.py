@@ -24,6 +24,8 @@ import ctrlxdatalayer
 from ctrlxdatalayer.provider_node import ProviderNodeCallbacks, NodeCallback
 from ctrlxdatalayer.variant import Result, Variant
 
+from comm.datalayer import NodeClass
+
 import json
 # import time
 import os
@@ -34,7 +36,7 @@ from jsonschema import validate
 import app.utils
 
 class Push:
-    dataString: str = "Hello from Python Provider"
+    # dataString: str = "Hello from Python Provider"
     id : int = 0
 
     schema = {
@@ -47,7 +49,7 @@ class Push:
         "required" : ["name", "email", "color"]
     }
     
-    def __init__(self, db):
+    def __init__(self, provider: ctrlxdatalayer.provider, db):
         self.cbs = ProviderNodeCallbacks(
         self.__on_create,
         self.__on_remove,
@@ -56,20 +58,42 @@ class Push:
         self.__on_write,
         self.__on_metadata
         )
+        self.providerNode = ctrlxdatalayer.provider_node.ProviderNode(self.cbs)
+
         self.db = db
+        self.provider = provider
+
+        self.name = "job_request"
+        self.address = "mechatronics/job_request"
+        self.description = 'Write job (json format) to add to pending jobs'
+
+        self.metadata = self.create_metadata("types/datalayer/string", self.name, '', self.description)
+        
+    def register_node(self):
+        return self.provider.register_node(self.address, self.providerNode)
+
+    def unregister_node(self):
+        self.provider.unregister_node(self.address)
+
+    def create_metadata(self, typeAddress: str, name: str, unit: str, description: str):
+
+        return ctrlxdatalayer.metadata_utils.MetadataBuilder.create_metadata(
+            name, description, unit, description+"_url", NodeClass.NodeClass.Variable,
+            read_allowed=True, write_allowed=True, create_allowed=False, delete_allowed=False, browse_allowed=True,
+           type_path=typeAddress)        
 
     def __on_create(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
-        self.dataString
-        cb(Result(Result.OK), None)
+        # self.dataString
+        cb(Result.OK, None)
 
     def __on_remove(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
         # Not implemented because no wildcard is registered
-        cb(Result(Result.UNSUPPORTED), None)
+        cb(Result.UNSUPPORTED, None)
 
     def __on_browse(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
         new_data = Variant()
         new_data.set_array_string([])
-        cb(Result(Result.OK), new_data)
+        cb(Result.OK, new_data)
 
     def __on_read(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         _data = Variant()
@@ -79,7 +103,7 @@ class Push:
             _data.set_string(json.dumps(app.utils.fetch_queue(conn, 50, 0))) 
             conn.close()
 
-        cb(Result(Result.OK), _data)
+        cb(Result.OK, _data)
     
     def __on_write(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         _test = json.loads(data.get_string())
@@ -90,16 +114,15 @@ class Push:
             app.utils.add_job_order(conn, json.dumps(_test))
             conn.close()
 
-        cb(Result(Result.OK), None)        
+        cb(Result.OK, None)        
 
     def __on_metadata(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
-        print("__on_metadata")
-        cb(Result(Result.OK), None)
+        cb(Result.OK, self.metadata)  
 
 class Pop:
     _value: str = ""
     
-    def __init__(self, db):
+    def __init__(self, provider: ctrlxdatalayer.provider, db):
         self.cbs = ProviderNodeCallbacks(
         self.__on_create,
         self.__on_remove,
@@ -108,7 +131,29 @@ class Pop:
         self.__on_write,
         self.__on_metadata
         )
+        self.providerNode = ctrlxdatalayer.provider_node.ProviderNode(self.cbs)
+
         self.db = db
+        self.provider = provider
+
+        self.name = "pop"
+        self.address = "mechatronics/pop"
+        self.description = 'Write 1 to pop next job from queue'
+
+        self.metadata = self.create_metadata("types/datalayer/string", self.name, '', self.description)
+        
+    def register_node(self):
+        return self.provider.register_node(self.address, self.providerNode)
+
+    def unregister_node(self):
+        self.provider.unregister_node(self.address)
+
+    def create_metadata(self, typeAddress: str, name: str, unit: str, description: str):
+
+        return ctrlxdatalayer.metadata_utils.MetadataBuilder.create_metadata(
+            name, description, unit, description+"_url", NodeClass.NodeClass.Variable,
+            read_allowed=True, write_allowed=True, create_allowed=False, delete_allowed=False, browse_allowed=True,
+           type_path=typeAddress)           
 
     def __on_create(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         self.dataString
@@ -143,12 +188,12 @@ class Pop:
         cb(Result(Result.OK), _data)        
 
     def __on_metadata(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
-        cb(Result(Result.OK), None)        
+        cb(Result.OK, self.metadata)      
 
 class Count:
     data: int = 0
     
-    def __init__(self, db):
+    def __init__(self, provider: ctrlxdatalayer.provider, db):
         self.cbs = ProviderNodeCallbacks(
         self.__on_create,
         self.__on_remove,
@@ -157,7 +202,29 @@ class Count:
         self.__on_write,
         self.__on_metadata
         )
+        self.providerNode = ctrlxdatalayer.provider_node.ProviderNode(self.cbs)
+
         self.db = db
+        self.provider = provider
+
+        self.name = "count"
+        self.address = "mechatronics/count"
+        self.description = 'Number of pending jobs in queue.  Write 0 to clear queue.'
+
+        self.metadata = self.create_metadata("types/datalayer/int32", self.name, '', self.description)
+        
+    def register_node(self):
+        return self.provider.register_node(self.address, self.providerNode)
+
+    def unregister_node(self):
+        self.provider.unregister_node(self.address)
+
+    def create_metadata(self, typeAddress: str, name: str, unit: str, description: str):
+
+        return ctrlxdatalayer.metadata_utils.MetadataBuilder.create_metadata(
+            name, description, unit, description+"_url", NodeClass.NodeClass.Variable,
+            read_allowed=True, write_allowed=True, create_allowed=False, delete_allowed=False, browse_allowed=True,
+           type_path=typeAddress)   
 
     def __on_create(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         print("__on_create")
@@ -194,13 +261,12 @@ class Count:
         cb(Result(Result.OK), None)
 
     def __on_metadata(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
-        print("__on_metadata")
-        cb(Result(Result.OK), None)              
+        cb(Result.OK, self.metadata)            
 
 class Done:
     _value: str = ""
     
-    def __init__(self, db):
+    def __init__(self, provider: ctrlxdatalayer.provider, db):
         self.cbs = ProviderNodeCallbacks(
         self.__on_create,
         self.__on_remove,
@@ -209,7 +275,29 @@ class Done:
         self.__on_write,
         self.__on_metadata
         )
+        self.providerNode = ctrlxdatalayer.provider_node.ProviderNode(self.cbs)
+
         self.db = db
+        self.provider = provider
+
+        self.name = "done"
+        self.address = "mechatronics/done"
+        self.description = 'Write id value to update time_out timestamp in history table'
+
+        self.metadata = self.create_metadata("types/datalayer/string", self.name, '', self.description)
+        
+    def register_node(self):
+        return self.provider.register_node(self.address, self.providerNode)
+
+    def unregister_node(self):
+        self.provider.unregister_node(self.address)
+
+    def create_metadata(self, typeAddress: str, name: str, unit: str, description: str):
+
+        return ctrlxdatalayer.metadata_utils.MetadataBuilder.create_metadata(
+            name, description, unit, description+"_url", NodeClass.NodeClass.Variable,
+            read_allowed=True, write_allowed=True, create_allowed=False, delete_allowed=False, browse_allowed=True,
+           type_path=typeAddress)   
 
     def __on_create(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         self.data
@@ -244,12 +332,12 @@ class Done:
         cb(Result(Result.OK), _data)
 
     def __on_metadata(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
-        cb(Result(Result.OK), None)            
+        cb(Result.OK, self.metadata)            
 
 class History:
     _value: str = ""
     
-    def __init__(self, db):
+    def __init__(self, provider: ctrlxdatalayer.provider, db):
         self.cbs = ProviderNodeCallbacks(
         self.__on_create,
         self.__on_remove,
@@ -258,7 +346,29 @@ class History:
         self.__on_write,
         self.__on_metadata
         )
+        self.providerNode = ctrlxdatalayer.provider_node.ProviderNode(self.cbs)
+
         self.db = db
+        self.provider = provider
+
+        self.name = "history"
+        self.address = "mechatronics/history"
+        self.description = 'Job history listing'
+
+        self.metadata = self.create_metadata("types/datalayer/string", self.name, '', self.description)
+        
+    def register_node(self):
+        return self.provider.register_node(self.address, self.providerNode)
+
+    def unregister_node(self):
+        self.provider.unregister_node(self.address)
+
+    def create_metadata(self, typeAddress: str, name: str, unit: str, description: str):
+
+        return ctrlxdatalayer.metadata_utils.MetadataBuilder.create_metadata(
+            name, description, unit, description+"_url", NodeClass.NodeClass.Variable,
+            read_allowed=True, write_allowed=False, create_allowed=False, delete_allowed=False, browse_allowed=True,
+           type_path=typeAddress)   
 
     def __on_create(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         self.data
@@ -287,11 +397,11 @@ class History:
         cb(Result(Result.OK), None)
 
     def __on_metadata(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
-        cb(Result(Result.OK), None)  
+        cb(Result.OK, self.metadata)  
 
 class Auto:
      
-    def __init__(self, auto):
+    def __init__(self, provider: ctrlxdatalayer.provider, auto):
         self.cbs = ProviderNodeCallbacks(
         self.__on_create,
         self.__on_remove,
@@ -300,7 +410,30 @@ class Auto:
         self.__on_write,
         self.__on_metadata
         )
+
+
+        self.providerNode = ctrlxdatalayer.provider_node.ProviderNode(self.cbs)
         self.auto = auto
+        self.provider = provider
+
+        self.name = "auto"
+        self.address = "mechatronics/auto"
+        self.description = 'Enable to auto-generate virtual jobs'
+
+        self.metadata = self.create_metadata("types/datalayer/bool8", self.name, '', self.description)
+        
+    def register_node(self):
+        return self.provider.register_node(self.address, self.providerNode)
+
+    def unregister_node(self):
+        self.provider.unregister_node(self.address)
+
+    def create_metadata(self, typeAddress: str, name: str, unit: str, description: str):
+
+        return ctrlxdatalayer.metadata_utils.MetadataBuilder.create_metadata(
+            name, description, unit, description+"_url", NodeClass.NodeClass.Variable,
+            read_allowed=True, write_allowed=True, create_allowed=False, delete_allowed=False, browse_allowed=True,
+           type_path=typeAddress)           
 
     def __on_create(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, data: Variant, cb: NodeCallback):
         cb(Result(Result.OK), None)
@@ -324,7 +457,7 @@ class Auto:
         cb(Result(Result.OK), None)
 
     def __on_metadata(self, userdata: ctrlxdatalayer.clib.userData_c_void_p, address: str, cb: NodeCallback):
-        cb(Result(Result.OK), None)    
+        cb(Result.OK, self.metadata)  
 
     def value(self):
         return self.auto          
